@@ -9,20 +9,20 @@
 	"CreatedByURL": "github.com/aaronShea",
 	"DocsURL": "https://github.com/getnamo/BLUI",
 	"EnabledByDefault" : true,
-	"CanContainContent": "true",
+	"CanContainContent": true,
 	"Modules": 
 	[
 		{
 			"Name" : "BluLoader",
 			"Type" : "Runtime",
 			"LoadingPhase" : "PreDefault",
-			"BlacklistPlatforms" :  ["Android", "iOS"]
+			"BlacklistPlatforms" :  ["Android", "IOS"]
 		},
 		{
 			"Name": "Blu",
 			"Type": "Runtime",
 			"LoadingPhase": "PreDefault",
-			"BlacklistPlatforms": ["Android", "iOS" ]
+			"BlacklistPlatforms": ["Android", "IOS" ]
 		}
 	]
 }
