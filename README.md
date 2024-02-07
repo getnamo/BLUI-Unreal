@@ -12,6 +12,8 @@ To install check out the latest releases https://github.com/getnamo/BLUI-Unreal/
 
 Unreal thread: https://forums.unrealengine.com/community/released-projects/29036-blui-open-source-html5-js-css-hud-ui
 
+[Discord Server](https://discord.gg/qfJUyxaW4s)
+
 ### Convenience Blueprints
 
 The native plugin didn't contain any self contained drag and drop examples so I've added some.
