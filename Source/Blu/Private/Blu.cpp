@@ -53,7 +53,5 @@ class FBlu : public IBlu
 };
 
 
-
-
 IMPLEMENT_MODULE( FBlu, Blu )
 DEFINE_LOG_CATEGORY(LogBlu);

@@ -1,4 +1,5 @@
 #include "BluJsonObj.h"
+#include "IBlu.h"
 #include "Json.h"
 
 UBluJsonObj::UBluJsonObj(const class FObjectInitializer& PCIP)

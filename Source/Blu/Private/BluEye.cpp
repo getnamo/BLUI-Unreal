@@ -1,5 +1,6 @@
 
 #include "BluEye.h"
+#include "IBlu.h"
 #include "RenderHandler.h"
 
 FTickEventLoopData UBluEye::EventLoopData = FTickEventLoopData();
