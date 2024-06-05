@@ -132,13 +132,12 @@ void UBluEye::DestroyTexture()
 	{
 		Texture->RemoveFromRoot();
 
-		auto Resource = Texture->GetResource();
+		FTextureResource* Resource = Texture->GetResource();
 
-		if (Resource)//Texture->GetResource())
+		if (Resource)
 		{
-			BeginReleaseResource(Texture->GetResource());
+			BeginReleaseResource(Resource);
 			Texture->UpdateResource();
-
 
 			//NB: these lines are the problem for 5.4 causes deadlock on game thread on exit
 			//StartBatchedRelease();
@@ -191,15 +190,12 @@ void UBluEye::TextureUpdate(const void *Buffer, FUpdateTextureRegion2D *UpdateRe
 		ENQUEUE_RENDER_COMMAND(UpdateBLUICommand)(
 		[RegionData](FRHICommandList& CommandList)
 		{
-			//if (bValidTexture)
+			for (uint32 RegionIndex = 0; RegionIndex < RegionData->NumRegions; RegionIndex++)
 			{
-				for (uint32 RegionIndex = 0; RegionIndex < RegionData->NumRegions; RegionIndex++)
-				{
-					RHIUpdateTexture2D(RegionData->Texture2DResource->TextureRHI->GetTexture2D(), 0, RegionData->Regions[RegionIndex], RegionData->SrcPitch, 
-						RegionData->SrcData.GetData()
-						+ RegionData->Regions[RegionIndex].SrcY * RegionData->SrcPitch
-						+ RegionData->Regions[RegionIndex].SrcX * RegionData->SrcBpp);
-				}
+				RHIUpdateTexture2D(RegionData->Texture2DResource->TextureRHI->GetTexture2D(), 0, RegionData->Regions[RegionIndex], RegionData->SrcPitch, 
+					RegionData->SrcData.GetData()
+					+ RegionData->Regions[RegionIndex].SrcY * RegionData->SrcPitch
+					+ RegionData->Regions[RegionIndex].SrcX * RegionData->SrcBpp);
 			}
 
 			FMemory::Free(RegionData->Regions);
@@ -714,9 +710,9 @@ void UBluEye::ResetMatInstance()
 
 void UBluEye::CloseBrowser()
 {
-	//BeginDestroy();
+	BeginDestroy();
 
-	if (Browser)
+	/*if (Browser)
 	{
 		// Close up the browser
 		Browser->GetHost()->SetAudioMuted(true);
@@ -737,17 +733,17 @@ void UBluEye::CloseBrowser()
 	{
 		FTSTicker::GetCoreTicker().RemoveTicker(EventLoopData.DelegateHandle);
 		EventLoopData.DelegateHandle = FTSTicker::FDelegateHandle();
-	}
+	}*/
 }
 
 void UBluEye::BeginDestroy()
 {
-	/*if (Browser)
+	if (Browser)
 	{
 		// Close up the browser
 		Browser->GetHost()->SetAudioMuted(true);
 		Browser->GetMainFrame()->LoadURL("about:blank");
-		//browser->GetMainFrame()->Delete();
+		//Browser->GetMainFrame()->Delete();
 		Browser->GetHost()->CloseDevTools();
 		Browser->GetHost()->CloseBrowser(true);
 		Browser = nullptr;
@@ -764,7 +760,7 @@ void UBluEye::BeginDestroy()
 	{
 		FTSTicker::GetCoreTicker().RemoveTicker(EventLoopData.DelegateHandle);
 		EventLoopData.DelegateHandle = FTSTicker::FDelegateHandle();
-	}*/
+	}
 	Super::BeginDestroy();
 }
 
