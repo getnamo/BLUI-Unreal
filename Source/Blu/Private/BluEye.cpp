@@ -118,7 +118,7 @@ void UBluEye::ResetTexture()
 	Texture->AddToRoot();
 	Texture->UpdateResource();
 
-	RenderParams.Texture2DResource = (FTexture2DResource*)Texture->GetResource();
+	//RenderParams.Texture2DResource = (FTexture2DResource*)Texture->GetResource();
 
 	ResetMatInstance();
 
@@ -132,65 +132,85 @@ void UBluEye::DestroyTexture()
 	{
 		Texture->RemoveFromRoot();
 
-		if (Texture->GetResource())
+		auto Resource = Texture->GetResource();
+
+		if (Resource)//Texture->GetResource())
 		{
 			BeginReleaseResource(Texture->GetResource());
-			FlushRenderingCommands();
+			Texture->UpdateResource();
+
+
+			//NB: these lines are the problem for 5.4 causes deadlock on game thread on exit
+			//StartBatchedRelease();
+			//BeginReleaseResource(Texture->GetResource());	// (FRenderCommandPipe*) &UE::RenderCommandPipe::GetPipes()[0]
+			//EndBatchedRelease();
+			//FlushRenderingCommands();
+
+			/* This is what that command does...
+			ENQUEUE_RENDER_COMMAND(UpdateBLUICommand)(
+			[Resource](FRHICommandList& CommandList)
+			{
+				Resource->ReleaseResource();
+			});*/
 		}
+		Resource = nullptr;
 
 		Texture->MarkAsGarbage();
 		Texture = nullptr;
-		bValidTexture = false;
 	}
+	bValidTexture = false;
 }
 
-void UBluEye::TextureUpdate(const void *buffer, FUpdateTextureRegion2D *updateRegions, uint32  regionCount)
+void UBluEye::TextureUpdate(const void *Buffer, FUpdateTextureRegion2D *UpdateRegions, uint32  RegionCount)
 {
 	if (!Browser || !bEnabled)
 	{
-		UE_LOG(LogBlu, Warning, TEXT("NO BROWSER ACCESS OR NOT ENABLED"))
+		UE_LOG(LogBlu, Warning, TEXT("No Browser access or BluEye not Enabled"))
 		return;
 	}
 
 	if (bValidTexture && Texture->IsValidLowLevelFast())
 	{
-
-		if (buffer == nullptr)
+		if (Buffer == nullptr)
 		{
-			UE_LOG(LogBlu, Warning, TEXT("NO TEXTDATA"))
-				return;
+			UE_LOG(LogBlu, Warning, TEXT("No Texture Data Buffer"))
+			return;
 		}
 	 
 		FUpdateTextureRegionsData* RegionData = new FUpdateTextureRegionsData;
 		RegionData->Texture2DResource = (FTextureResource*)Texture->GetResource();
-		RegionData->NumRegions = regionCount;
+		RegionData->NumRegions = RegionCount;
 		RegionData->SrcBpp = 4;
 		RegionData->SrcPitch = int32(Settings.ViewSize.X) * 4;
-		RegionData->Regions = updateRegions;
+		RegionData->Regions = UpdateRegions;
 
 		//We need to copy this memory or it might get uninitialized
 		RegionData->SrcData.SetNumUninitialized(RegionData->SrcPitch * int32(Settings.ViewSize.Y));
-		FPlatformMemory::Memcpy(RegionData->SrcData.GetData(), buffer, RegionData->SrcData.Num());
+		FPlatformMemory::Memcpy(RegionData->SrcData.GetData(), Buffer, RegionData->SrcData.Num());
 
 		ENQUEUE_RENDER_COMMAND(UpdateBLUICommand)(
-			[RegionData](FRHICommandList& CommandList)
+		[RegionData](FRHICommandList& CommandList)
+		{
+			//if (bValidTexture)
 			{
 				for (uint32 RegionIndex = 0; RegionIndex < RegionData->NumRegions; RegionIndex++)
 				{
-					RHIUpdateTexture2D(RegionData->Texture2DResource->TextureRHI->GetTexture2D(), 0, RegionData->Regions[RegionIndex], RegionData->SrcPitch, RegionData->SrcData.GetData()
+					RHIUpdateTexture2D(RegionData->Texture2DResource->TextureRHI->GetTexture2D(), 0, RegionData->Regions[RegionIndex], RegionData->SrcPitch, 
+						RegionData->SrcData.GetData()
 						+ RegionData->Regions[RegionIndex].SrcY * RegionData->SrcPitch
 						+ RegionData->Regions[RegionIndex].SrcX * RegionData->SrcBpp);
 				}
+			}
 
-				FMemory::Free(RegionData->Regions);
-				delete RegionData;
-			});
+			FMemory::Free(RegionData->Regions);
+			delete RegionData;
+		});
 
 	}
-	else {
-		UE_LOG(LogBlu, Warning, TEXT("no Texture or Texture->resource"))
+	else 
+	{
+		UE_LOG(LogBlu, Warning, TEXT("No Texture or Texture->GetResource()"))
 	}
-
 }
 
 void UBluEye::ExecuteJS(const FString& Code)
@@ -694,11 +714,8 @@ void UBluEye::ResetMatInstance()
 
 void UBluEye::CloseBrowser()
 {
-	BeginDestroy();
-}
+	//BeginDestroy();
 
-void UBluEye::BeginDestroy()
-{
 	if (Browser)
 	{
 		// Close up the browser
@@ -709,6 +726,31 @@ void UBluEye::BeginDestroy()
 		Browser->GetHost()->CloseBrowser(true);
 		Browser = nullptr;
 
+		UE_LOG(LogBlu, Warning, TEXT("Browser Closing"));
+	}
+
+	DestroyTexture();
+
+	//Remove our auto-ticking setup
+	EventLoopData.EyeCount--;
+	if (EventLoopData.EyeCount <= 0)
+	{
+		FTSTicker::GetCoreTicker().RemoveTicker(EventLoopData.DelegateHandle);
+		EventLoopData.DelegateHandle = FTSTicker::FDelegateHandle();
+	}
+}
+
+void UBluEye::BeginDestroy()
+{
+	/*if (Browser)
+	{
+		// Close up the browser
+		Browser->GetHost()->SetAudioMuted(true);
+		Browser->GetMainFrame()->LoadURL("about:blank");
+		//browser->GetMainFrame()->Delete();
+		Browser->GetHost()->CloseDevTools();
+		Browser->GetHost()->CloseBrowser(true);
+		Browser = nullptr;
 
 		UE_LOG(LogBlu, Warning, TEXT("Browser Closing"));
 	}
@@ -722,7 +764,7 @@ void UBluEye::BeginDestroy()
 	{
 		FTSTicker::GetCoreTicker().RemoveTicker(EventLoopData.DelegateHandle);
 		EventLoopData.DelegateHandle = FTSTicker::FDelegateHandle();
-	}
+	}*/
 	Super::BeginDestroy();
 }
 

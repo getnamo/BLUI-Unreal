@@ -207,7 +207,7 @@ public:
 	//UFUNCTION(BlueprintCallable, Category = "Blu")
 	UTexture2D* CropWindow(const int32 Y, const int32 X, const int32 NewWidth, const int32 NewHeight);
 
-	void TextureUpdate(const void* buffer, FUpdateTextureRegion2D * updateRegions, uint32  regionCount);
+	void TextureUpdate(const void* Buffer, FUpdateTextureRegion2D * UpdateRegions, uint32  RegionCount);
 
 	void BeginDestroy() override;
 
