@@ -192,6 +192,7 @@ void UBluEye::TextureUpdate(const void *Buffer, FUpdateTextureRegion2D *UpdateRe
 		{
 			for (uint32 RegionIndex = 0; RegionIndex < RegionData->NumRegions; RegionIndex++)
 			{
+				//NB: FORCEINLINE void RHIUpdateTexture2D(FRHITexture2D* Texture, uint32 MipIndex, const struct FUpdateTextureRegion2D& UpdateRegion, uint32 SourcePitch, const uint8* SourceData)
 				RHIUpdateTexture2D(RegionData->Texture2DResource->TextureRHI->GetTexture2D(), 0, RegionData->Regions[RegionIndex], RegionData->SrcPitch, 
 					RegionData->SrcData.GetData()
 					+ RegionData->Regions[RegionIndex].SrcY * RegionData->SrcPitch
@@ -652,7 +653,13 @@ void UBluEye::SpawnTickEventLoopIfNeeded()
 				{
 					UE_LOG(LogTemp, Log, TEXT("Delta: %1.2f"), DeltaTime);
 				}
-				BluManager::DoBluMessageLoop();
+
+				//NB: this wrapper doesn't crash, but will fail to render
+				//Async(EAsyncExecution::ThreadPool, [this] 
+				//{
+					BluManager::DoBluMessageLoop();
+				//});
+				
 			}
 			
 			return true;

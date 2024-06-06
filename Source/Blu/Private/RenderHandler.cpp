@@ -18,15 +18,15 @@ void RenderHandler::OnPaint(CefRefPtr<CefBrowser> Browser, PaintElementType Type
 {
 	FUpdateTextureRegion2D *UpdateRegions = static_cast<FUpdateTextureRegion2D*>(FMemory::Malloc(sizeof(FUpdateTextureRegion2D) * DirtyRects.size()));
 
-	int Current = 0;
+	int RegionIndex = 0;
 	for (auto DirtyRect : DirtyRects)
 	{
-		UpdateRegions[Current].DestX = UpdateRegions[Current].SrcX = DirtyRect.x;
-		UpdateRegions[Current].DestY = UpdateRegions[Current].SrcY = DirtyRect.y;
-		UpdateRegions[Current].Height = DirtyRect.height;
-		UpdateRegions[Current].Width = DirtyRect.width;
+		UpdateRegions[RegionIndex].DestX = UpdateRegions[RegionIndex].SrcX = DirtyRect.x;
+		UpdateRegions[RegionIndex].DestY = UpdateRegions[RegionIndex].SrcY = DirtyRect.y;
+		UpdateRegions[RegionIndex].Height = DirtyRect.height;
+		UpdateRegions[RegionIndex].Width = DirtyRect.width;
 
-		Current++;
+		RegionIndex++;
 	}
 
 	// Trigger our parent UIs Texture to update
