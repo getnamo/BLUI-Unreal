@@ -188,21 +188,16 @@ void UBluEye::TextureUpdate(const void *Buffer, FUpdateTextureRegion2D *UpdateRe
 		FPlatformMemory::Memcpy(RegionData->SrcData.GetData(), Buffer, RegionData->SrcData.Num());
 
 		ENQUEUE_RENDER_COMMAND(UpdateBLUICommand)(
-		[RegionData](FRHICommandList& CommandList)
-		{
-			for (uint32 RegionIndex = 0; RegionIndex < RegionData->NumRegions; RegionIndex++)
+			[RegionData](FRHICommandList& CommandList)
 			{
-				//NB: FORCEINLINE void RHIUpdateTexture2D(FRHITexture2D* Texture, uint32 MipIndex, const struct FUpdateTextureRegion2D& UpdateRegion, uint32 SourcePitch, const uint8* SourceData)
-				RHIUpdateTexture2D(RegionData->Texture2DResource->TextureRHI->GetTexture2D(), 0, RegionData->Regions[RegionIndex], RegionData->SrcPitch, 
-					RegionData->SrcData.GetData()
-					+ RegionData->Regions[RegionIndex].SrcY * RegionData->SrcPitch
-					+ RegionData->Regions[RegionIndex].SrcX * RegionData->SrcBpp);
-			}
+				for (uint32 RegionIndex = 0; RegionIndex < RegionData->NumRegions; RegionIndex++)
+				{
+					RHIUpdateTexture2D(RegionData->Texture2DResource->TextureRHI->GetTexture2D(), 0, RegionData->Regions[RegionIndex], RegionData->SrcPitch, RegionData->SrcData.GetData());
+				}
 
-			FMemory::Free(RegionData->Regions);
-			delete RegionData;
-		});
-
+				FMemory::Free(RegionData->Regions);
+				delete RegionData;
+			});
 	}
 	else 
 	{
