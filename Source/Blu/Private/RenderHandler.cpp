@@ -49,13 +49,13 @@ void BrowserClient::OnBeforeClose(CefRefPtr<CefBrowser> Browser)
 	//CEF_REQUIRE_UI_THREAD();
 	if (BrowserId == Browser->GetIdentifier())
 	{
-		BrowserRef = NULL;
+		BrowserRef = nullptr;
 	}
 }
 
 bool BrowserClient::OnConsoleMessage(CefRefPtr<CefBrowser> Browser, cef_log_severity_t Level, const CefString& Message, const CefString& source, int line)
 {
-	FString LogMessage = FString(Message.c_str());
+	FString LogMessage = FString(Message.ToWString().c_str());
 	LogEmitter->Broadcast(LogMessage);
 	return true;
 }
@@ -67,7 +67,7 @@ void BrowserClient::OnFullscreenModeChange(CefRefPtr< CefBrowser > Browser, bool
 
 void BrowserClient::OnTitleChange(CefRefPtr< CefBrowser > Browser, const CefString& Title)
 {
-	FString TitleMessage = FString(Title.c_str());
+	FString TitleMessage = FString(Title.ToWString().c_str());
 	LogEmitter->Broadcast(TitleMessage);
 }
 
@@ -105,7 +105,7 @@ bool BrowserClient::OnProcessMessageReceived(CefRefPtr<CefBrowser> Browser, CefR
 
 void BrowserClient::OnUncaughtException(CefRefPtr<CefBrowser> Browser, CefRefPtr<CefFrame> Frame, CefRefPtr<CefV8Context> Context, CefRefPtr<CefV8Exception> Exception, CefRefPtr<CefV8StackTrace> StackTrace)
 {
-	FString ErrorMessage = FString(Exception->GetMessage().c_str());
+	FString ErrorMessage = FString(Exception->GetMessage().ToWString().c_str());
 	UE_LOG(LogClass, Warning, TEXT("%s"), *ErrorMessage);
 }
 
@@ -130,7 +130,7 @@ void BrowserClient::SetLogEmitter(FLogEvent* Emitter)
 	this->LogEmitter = Emitter;
 }
 
-void BrowserClient::OnBeforeDownload(
+bool BrowserClient::OnBeforeDownload(
 	CefRefPtr<CefBrowser> Browser,
 	CefRefPtr<CefDownloadItem> DownloadItem,
 	const CefString & SuggestedName,
@@ -140,11 +140,13 @@ void BrowserClient::OnBeforeDownload(
 	UNREFERENCED_PARAMETER(DownloadItem);
 
 	//We use this concatenation method to mix c_str with regular FString and then convert the result back to c_str
-	FString DownloadPath = UtilityBLUIDownloadsFolder() + FString(SuggestedName.c_str());
+	FString DownloadPath = UtilityBLUIDownloadsFolder() + FString(SuggestedName.ToWString().c_str());
 
 	Callback->Continue(*DownloadPath, false);	//don't show the download dialog, just go for it
 
 	UE_LOG(LogClass, Log, TEXT("Downloading file for path %s"), *DownloadPath);
+
+	return true;
 }
 
 void BrowserClient::OnDownloadUpdated(
@@ -153,7 +155,7 @@ void BrowserClient::OnDownloadUpdated(
 	CefRefPtr<CefDownloadItemCallback> Callback)
 {
 	int Percentage = DownloadItem->GetPercentComplete();
-	FString Url = FString(DownloadItem->GetFullPath().c_str());
+	FString Url = FString(DownloadItem->GetFullPath().ToWString().c_str());
 	
 	UE_LOG(LogClass, Log, TEXT("Download %s Updated: %d"), *Url , Percentage);
 

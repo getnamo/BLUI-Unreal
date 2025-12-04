@@ -49,14 +49,12 @@ void UBluEye::Init()
 		return;
 	}
 
-	BrowserSettings.universal_access_from_file_urls = STATE_ENABLED;
-	BrowserSettings.file_access_from_file_urls = STATE_ENABLED;
+	//These no longer exist
+	//BrowserSettings.universal_access_from_file_urls = STATE_ENABLED;
+	//BrowserSettings.file_access_from_file_urls = STATE_ENABLED;
 
 	//BrowserSettings.web_security = STATE_DISABLED;
 	//BrowserSettings.fullscreen_enabled = true;
-
-	Info.width = (int32)Settings.ViewSize.X;
-	Info.height = (int32)Settings.ViewSize.Y;
 
 	// Set transparant option
 	Info.SetAsWindowless(0); //bIsTransparent
@@ -81,8 +79,8 @@ void UBluEye::Init()
 		ClientHandler.get(),
 		"about:blank",
 		BrowserSettings,
-		NULL,
-		NULL);
+		nullptr,
+		nullptr);
 
 
 	Browser->GetHost()->SetWindowlessFrameRate(Settings.FrameRate);
@@ -273,7 +271,7 @@ void UBluEye::LoadURL(const FString& newURL)
 
 FString UBluEye::GetCurrentURL()
 {
-	return FString(Browser->GetMainFrame()->GetURL().c_str());
+	return FString(Browser->GetMainFrame()->GetURL().ToWString().c_str());
 }
 
 void UBluEye::SetZoom(const float Scale /*= 1*/)
@@ -430,7 +428,7 @@ void UBluEye::TriggerMouseMove(const FVector2D& Pos, const float Scale)
 	MouseEvent.x = Pos.X / Scale;
 	MouseEvent.y = Pos.Y / Scale;
 
-	Browser->GetHost()->SendFocusEvent(true);
+	Browser->GetHost()->SetFocus(true);
 	Browser->GetHost()->SendMouseMoveEvent(MouseEvent, false);
 
 }

@@ -84,7 +84,7 @@ class BrowserClient : public CefClient, public CefLifeSpanHandler, public CefDow
 		void SetLogEmitter(FLogEvent* Emitter);
 
 		//CefDownloadHandler
-		virtual void OnBeforeDownload(
+		virtual bool OnBeforeDownload(
 			CefRefPtr<CefBrowser> Browser,
 			CefRefPtr<CefDownloadItem> DownloadItem,
 			const CefString& SuggestedName,
