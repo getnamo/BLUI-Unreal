@@ -6,7 +6,7 @@
 
 A fork of BLUI that is kept relatively up to date.
 
-Latest release is updated to [CEF 90.0.4430.212](https://bitbucket.org/chromiumembedded/cef/src/4430/). See https://github.com/getnamo/BLUbrowser for repo for cef process build.
+Latest release is updated to [CEF 128.0.6613.138](https://bitbucket.org/chromiumembedded/cef/src/6613/). See https://github.com/getnamo/BLUbrowser for repo for cef process build.
 
 To install check out the latest releases https://github.com/getnamo/BLUI-Unreal/releases and drag and drop *Plugins* folder into your project root folder
 
