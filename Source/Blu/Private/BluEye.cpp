@@ -74,6 +74,11 @@ void UBluEye::Init()
 
 	Renderer = new RenderHandler(Settings.ViewSize.X, Settings.ViewSize.Y, this);
 	ClientHandler = new BrowserClient(Renderer);
+
+	// Setup JS event emitter
+	ClientHandler->SetEventEmitter(&ScriptEventEmitter);
+	ClientHandler->SetLogEmitter(&LogEventEmitter);
+
 	Browser = CefBrowserHost::CreateBrowserSync(
 		Info,
 		ClientHandler.get(),
@@ -85,10 +90,6 @@ void UBluEye::Init()
 
 	Browser->GetHost()->SetWindowlessFrameRate(Settings.FrameRate);
 	Browser->GetHost()->SetAudioMuted(Settings.bAudioMuted);
-
-	// Setup JS event emitter
-	ClientHandler->SetEventEmitter(&ScriptEventEmitter);
-	ClientHandler->SetLogEmitter(&LogEventEmitter);
 
 	UE_LOG(LogBlu, Log, TEXT("Component Initialized"));
 	UE_LOG(LogBlu, Log, TEXT("Loading URL: %s"), *DefaultURL);
@@ -537,6 +538,7 @@ void UBluEye::CharKeyInput(FCharacterEvent CharEvent)
     KeyEvent.native_key_code = CharEvent.GetCharacter();
 #endif
 	KeyEvent.type = KEYEVENT_CHAR;
+	Browser->GetHost()->SetFocus(true);
 	Browser->GetHost()->SendKeyEvent(KeyEvent);
 }
 
@@ -560,7 +562,7 @@ void UBluEye::CharKeyDownUp(FCharacterEvent CharEvent)
 	Browser->GetHost()->SendKeyEvent(KeyEvent);
 }
 
-void UBluEye::RawCharKeyPress(const FString CharToPress, bool isRepeat,
+void UBluEye::RawCharKeyPress(const FString CharToPress, bool bIsRepeat,
 	bool LeftShiftDown,
 	bool RightShiftDown,
 	bool LeftControlDown,
@@ -575,10 +577,20 @@ void UBluEye::RawCharKeyPress(const FString CharToPress, bool isRepeat,
 	FModifierKeysState* KeyState = new FModifierKeysState(LeftShiftDown, RightShiftDown, LeftControlDown, 
 		RightControlDown, LeftAltDown, RightAltDown, LeftCommandDown, RightCommandDown, CapsLocksOn);
 
-	FCharacterEvent* CharEvent = new FCharacterEvent(CharToPress.GetCharArray()[0], *KeyState, 0, isRepeat);
+	FCharacterEvent* CharEvent = new FCharacterEvent(CharToPress.GetCharArray()[0], *KeyState, 0, bIsRepeat);
 
 	CharKeyInput(*CharEvent);
 
+}
+
+void UBluEye::RawCharKeyDownUp(const FString CharToPress, bool bIsRepeat, bool LeftShiftDown, bool RightShiftDown, bool LeftControlDown, bool RightControlDown, bool LeftAltDown, bool RightAltDown, bool LeftCommandDown, bool RightCommandDown, bool CapsLocksOn)
+{
+	FModifierKeysState* KeyState = new FModifierKeysState(LeftShiftDown, RightShiftDown, LeftControlDown,
+		RightControlDown, LeftAltDown, RightAltDown, LeftCommandDown, RightCommandDown, CapsLocksOn);
+
+	FCharacterEvent* CharEvent = new FCharacterEvent(CharToPress.GetCharArray()[0], *KeyState, 0, bIsRepeat);
+
+	CharKeyDownUp(*CharEvent);
 }
 
 void UBluEye::SpecialKeyPress(EBluSpecialKeys Key, bool LeftShiftDown,

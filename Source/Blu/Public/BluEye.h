@@ -156,7 +156,7 @@ public:
 
 	/** Trigger a raw keypress via a character */
 	UFUNCTION(BlueprintCallable, Category = "Blu", meta = (AdvancedDisplay = "2"))
-	void RawCharKeyPress(const FString charToPress, bool isRepeat,
+	void RawCharKeyPress(const FString CharToPress, bool bIsRepeat,
 								bool LeftShiftDown,
 								bool RightShiftDown,
 								bool LeftControlDown,
@@ -166,6 +166,19 @@ public:
 								bool LeftCommandDown,
 								bool RightCommandDown,
 								bool CapsLocksOn);
+
+	/** Trigger a raw keypress via a character */
+	UFUNCTION(BlueprintCallable, Category = "Blu", meta = (AdvancedDisplay = "2"))
+	void RawCharKeyDownUp(const FString CharToPress, bool bIsRepeat,
+		bool LeftShiftDown,
+		bool RightShiftDown,
+		bool LeftControlDown,
+		bool RightControlDown,
+		bool LeftAltDown,
+		bool RightAltDown,
+		bool LeftCommandDown,
+		bool RightCommandDown,
+		bool CapsLocksOn);
 
 	UFUNCTION(BlueprintCallable, Category = "Blu", meta = (AdvancedDisplay = "2"))
 	void SpecialKeyPress(EBluSpecialKeys key,
