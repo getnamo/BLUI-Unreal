@@ -10,8 +10,6 @@ Latest release is updated to [CEF 128.0.6613.138](https://bitbucket.org/chromium
 
 To install check out the latest releases https://github.com/getnamo/BLUI-Unreal/releases and drag and drop *Plugins* folder into your project root folder
 
-Unreal thread: https://forums.unrealengine.com/community/released-projects/29036-blui-open-source-html5-js-css-hud-ui
-
 [Discord Server](https://discord.gg/qfJUyxaW4s)
 
 ### Convenience Blueprints
