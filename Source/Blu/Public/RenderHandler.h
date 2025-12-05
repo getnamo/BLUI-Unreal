@@ -69,6 +69,12 @@ class BrowserClient : public CefClient, public CefLifeSpanHandler, public CefDow
 			return this; 	
 		}
 
+		// needed or console log & js script callbacks won't show up
+		virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override
+		{
+			return this;
+		}
+
 		virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> Browser, 
 			CefRefPtr<CefFrame> Frame,
 			CefProcessId SourceProcess, 

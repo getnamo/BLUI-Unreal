@@ -56,6 +56,7 @@ void BrowserClient::OnBeforeClose(CefRefPtr<CefBrowser> Browser)
 bool BrowserClient::OnConsoleMessage(CefRefPtr<CefBrowser> Browser, cef_log_severity_t Level, const CefString& Message, const CefString& source, int line)
 {
 	FString LogMessage = FString(Message.ToWString().c_str());
+	//UE_LOG(LogTemp, Log, TEXT("Console.log: %s"), *LogMessage);
 	LogEmitter->Broadcast(LogMessage);
 	return true;
 }
