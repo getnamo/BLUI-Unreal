@@ -24,7 +24,7 @@ class FBlu : public IBlu
 		ExecutablePath += "Mac/shipping/blu_ue4_process.app/Contents/MacOS/blu_ue4_process";
 	#endif
 	#if PLATFORM_WINDOWS
-		ExecutablePath += "Win/shipping/blu_ue4_process.exe";
+		ExecutablePath += "Win/shipping/BluBrowserProcess.exe";
 	#endif
 
 		CefString realExePath = *ExecutablePath;
