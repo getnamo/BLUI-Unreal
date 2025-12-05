@@ -8,21 +8,20 @@
 	"CreatedBy": "Aaron M. Shea, Getnamo, & Contributors",
 	"CreatedByURL": "github.com/getnamo",
 	"DocsURL": "https://github.com/getnamo/BLUI",
-	"EnabledByDefault" : true,
+	"EnabledByDefault": true,
 	"CanContainContent": true,
-	"Modules": 
-	[
+	"Modules": [
 		{
-			"Name" : "BluLoader",
-			"Type" : "Runtime",
-			"LoadingPhase" : "PreDefault",
-			"BlacklistPlatforms" :  ["Android", "IOS"]
+			"Name": "BluLoader",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault",
+			"BlacklistPlatforms": [ "Android", "IOS" ]
 		},
 		{
 			"Name": "Blu",
 			"Type": "Runtime",
 			"LoadingPhase": "PreDefault",
-			"BlacklistPlatforms": ["Android", "IOS" ]
+			"BlacklistPlatforms": [ "Android", "IOS" ]
 		}
-	]
+	],
 }
